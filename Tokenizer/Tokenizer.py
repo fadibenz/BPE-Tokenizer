@@ -1,7 +1,7 @@
 import json
 from typing import Iterable, Iterator
 import regex as re
-from cs336_basics.Tokenizer.BPE_Tokenizer_Optimized import pre_tokenization
+from Tokenizer.BPE_Tokenizer_Optimized import pre_tokenization
 
 class Tokenizer:
     def __init__(self, vocab:dict[int, bytes],
