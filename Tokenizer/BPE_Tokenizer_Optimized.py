@@ -1,152 +1,1 @@
-import regex as re
-from collections import Counter, defaultdict
-
-
-def pre_tokenization(training_data, special_tokens):
-    # This is taken from github.com/openai/tiktoken/pull/234/files (GPT2)
-    PAT =  r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
-
-
-    if not special_tokens:
-        return [m.group() for m in re.finditer(PAT, training_data)]
-
-    escaped_list = [re.escape(special_token) for special_token in special_tokens]
-    split_PAT = r"((?:{})+)".format("|".join(escaped_list))
-    split_corpus = re.split(split_PAT, training_data)
-
-    pretokenized_train_data = []
-    for segment in split_corpus:
-        token_list = [special_token for special_token in special_tokens if special_token in segment]
-        if not segment:
-            continue
-        if len(token_list) >= 1:
-            pretokenized_train_data.append(segment)
-        else:
-            for m in re.finditer(PAT, segment):
-                pretokenized_train_data.append(m.group())
-
-    return pretokenized_train_data
-
-
-def train_bpe(file_path: str,
-              vocab_size: int,
-              special_tokens: list[str],
-              ):
-    merges = []
-    bigram_locations = defaultdict(lambda: defaultdict(set))
-
-    # reading file
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            training_data = f.read()
-    except FileNotFoundError:
-        print(f"Error: The file '{file_path}' was not found.")
-        return
-    except Exception as e:
-        print(f"An error occurred while reading the file: {e}")
-        return
-
-    if not isinstance(special_tokens, list):
-        special_tokens = []
-
-    vocab = {i: bytes([i]) for i in range(256)}
-
-    for i, token in enumerate(special_tokens):
-        vocab[256 + i] = token.encode("utf-8")
-
-    pretokenized_data = pre_tokenization(training_data, special_tokens)
-
-    word_counts = Counter(pretokenized_data)
-
-    constructed_vocab = {}
-    for word, count in word_counts.items():
-        if word in special_tokens:
-            continue
-        constructed_vocab[tuple(word.encode("utf-8"))] = count
-
-    potential_merges = defaultdict(int)
-    for word_tuple, count in constructed_vocab.items():
-        for i in range(len(word_tuple) - 1):
-            bigram = (word_tuple[i], word_tuple[i + 1])
-            potential_merges[bigram] += count
-            bigram_locations[bigram][word_tuple].add(i)
-
-    # --- The Merging Loop ---
-
-    num_merges = vocab_size - len(vocab)
-    for i in range(num_merges):
-        if not potential_merges:
-            print("No more pairs to merge. Stopping early.")
-            break
-
-        v = max(potential_merges.values())
-        keys = [k for k, val in potential_merges.items() if val == v]
-        best_pair = max(keys)
-
-        new_token_id = 256 + len(special_tokens) + i
-
-        merges.append(best_pair)
-        vocab[new_token_id] = vocab[best_pair[0]] + vocab[best_pair[1]]
-
-        words_affected = list(bigram_locations[best_pair].keys())
-
-        for word_tuple in words_affected:
-            if word_tuple not in constructed_vocab:
-                continue
-
-            count = constructed_vocab[word_tuple]
-
-            # Decrement stats for all bigrams in the OLD word.
-            for j in range(len(word_tuple) - 1):
-                bigram = (word_tuple[j], word_tuple[j + 1])
-                potential_merges[bigram] -= count
-                if potential_merges[bigram] <= 0:
-                    del potential_merges[bigram]
-
-                if bigram in bigram_locations and word_tuple in bigram_locations[bigram]:
-                    bigram_locations[bigram][word_tuple].discard(j)
-                    if not bigram_locations[bigram][word_tuple]:
-                        del bigram_locations[bigram][word_tuple]
-
-            new_word_list = []
-            k = 0
-            while k < len(word_tuple):
-                if k < len(word_tuple) - 1 and (word_tuple[k], word_tuple[k + 1]) == best_pair:
-                    new_word_list.append(new_token_id)
-                    k += 2
-                else:
-                    new_word_list.append(word_tuple[k])
-                    k += 1
-            new_word_tuple = tuple(new_word_list)
-
-            del constructed_vocab[word_tuple]
-            constructed_vocab[new_word_tuple] = constructed_vocab.get(new_word_tuple, 0) + count
-
-            # Increment stats for all bigrams in the NEW word.
-            for j in range(len(new_word_tuple) - 1):
-                bigram = (new_word_tuple[j], new_word_tuple[j + 1])
-                potential_merges[bigram] += count
-                bigram_locations[bigram][new_word_tuple].add(j)
-
-        if best_pair in bigram_locations:
-            del bigram_locations[best_pair]
-
-    readable_merges = [(vocab[p1], vocab[p2]) for p1, p2 in merges]
-    return vocab, readable_merges
-
-
-def main():
-    vocab_size = 276
-    vocab, merges = train_bpe("../test.txt", vocab_size, special_tokens=["<|endoftext|>"])
-    print(vocab)
-    print(merges)
-
-if __name__ == "__main__":
-    import cProfile
-    import pstats
-
-    # with cProfile.Profile() as pr:
-    main()
-
-    # stats = pstats.Stats(pr)
-    # stats.sort_stats("cumtime").print_stats(25)
+import regex as refrom collections import Counter, defaultdictfrom git.diff import decode_pathdef pre_tokenization(training_data, special_tokens):    # This is taken from github.com/openai/tiktoken/pull/234/files (GPT2)    PAT = r"""'(?:[sdmt]|ll|ve|re)| ?\p{N}+| ?\p{L}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""    if not special_tokens:        return [m.group() for m in re.finditer(PAT, training_data)]    escaped_list = [re.escape(special_token) for special_token in special_tokens]    split_PAT = r"((?:{})+)".format("|".join(escaped_list))    split_corpus = re.split(split_PAT, training_data)    pretokenized_train_data = []    for segment in split_corpus:        token_list = [special_token for special_token in special_tokens if special_token in segment]        if not segment:            continue        if len(token_list) >= 1:            pretokenized_train_data.append(segment)        else:            for m in re.finditer(PAT, segment):                pretokenized_train_data.append(m.group())    return pretokenized_train_datadef train_bpe(file_path: str,              vocab_size: int,              special_tokens: list[str],              ):    merges = []    bigram_locations = defaultdict(lambda: defaultdict(set))    # reading file    try:        with open(file_path, 'r', encoding='utf-8') as f:            training_data = f.read()    except FileNotFoundError:        print(f"Error: The file '{file_path}' was not found.")        return    except Exception as e:        print(f"An error occurred while reading the file: {e}")        return    if not isinstance(special_tokens, list):        special_tokens = []    vocab = {i: bytes([i]) for i in range(256)}    token_str = {i: chr(i) for i in range(256)}    for i, token in enumerate(special_tokens):        vocab[256 + i] = token.encode("utf-8")    pretokenized_data = pre_tokenization(training_data, special_tokens)    # print(pretokenized_data)    word_counts = Counter(pretokenized_data)    constructed_vocab = {}    for word, count in word_counts.items():        if word in special_tokens:            continue        constructed_vocab[tuple(word.encode("utf-8"))] = count    # print(f"\n before merge: {constructed_vocab}")    potential_merges = defaultdict(int)    for word_tuple, count in constructed_vocab.items():        for i in range(len(word_tuple) - 1):            bigram = (word_tuple[i], word_tuple[i + 1])            potential_merges[bigram] += count            bigram_locations[bigram][word_tuple].add(i)    # --- The Merging Loop ---    num_merges = vocab_size - len(vocab)    for i in range(num_merges):        # if (i == 92) :        #     print(f" potential merges {i} {potential_merges}")        #     print(f"\n constructed vocab {i}: {constructed_vocab}")        #        if not potential_merges:            print("No more pairs to merge. Stopping early.")            break        # Find the most frequent pair - simple approach first        max_freq = -1        for pair in potential_merges:            if potential_merges[pair] > max_freq:                max_freq = potential_merges[pair]        candidate_pairs = [pair for pair, freq in potential_merges.items() if freq == max_freq]        if len(candidate_pairs) > 1:            print(f"iteration {i} {candidate_pairs}")            choice = max(                    candidate_pairs,                    key = lambda pair: (token_str[pair[0]], token_str[pair[1]]))            print(f"we choose {choice}")        # helper to turn an ID into its string symbol        best_pair = max(                    candidate_pairs,                    key = lambda pair: (token_str[pair[0]], token_str[pair[1]]))        new_token_id = 256 + len(special_tokens) + i        merges.append(best_pair)        vocab[new_token_id] = vocab[best_pair[0]] + vocab[best_pair[1]]        token_str[new_token_id] = token_str[best_pair[0]] + token_str[best_pair[1]]        words_affected = list(bigram_locations[best_pair].keys())        expected_bigram_decrease = 0        for word_tuple in words_affected:            if word_tuple not in constructed_vocab:                continue            count = constructed_vocab[word_tuple]            expected_bigram_decrease += count            # Decrement stats for all bigrams in the OLD word.            for j in range(len(word_tuple) - 1):                bigram = (word_tuple[j], word_tuple[j + 1])                potential_merges[bigram] -= count                if bigram in bigram_locations and word_tuple in bigram_locations[bigram]:                    bigram_locations[bigram][word_tuple].discard(j)                    if not bigram_locations[bigram][word_tuple]:                        del bigram_locations[bigram][word_tuple]                if potential_merges[bigram] <= 0:                    del potential_merges[bigram]            new_word_list = []            k = 0            while k < len(word_tuple):                if k < len(word_tuple) - 1 and (word_tuple[k], word_tuple[k + 1]) == best_pair:                    new_word_list.append(new_token_id)                    k += 2                else:                    new_word_list.append(word_tuple[k])                    k += 1            new_word_tuple = tuple(new_word_list)            # Here, constructed_vocab contains distinct pairs, so there will be only one new_word_tuple            del constructed_vocab[word_tuple]            constructed_vocab[new_word_tuple] = count            # Increment stats for all bigrams in the NEW word.            for j in range(len(new_word_tuple) - 1):                bigram = (new_word_tuple[j], new_word_tuple[j + 1])                potential_merges[bigram] += count                bigram_locations[bigram][new_word_tuple].add(j)        # Clean up the best_pair from bigram_locations (it should already be empty, but just to be safe)        if best_pair in bigram_locations:            del bigram_locations[best_pair]    readable_merges = [(vocab[p1], vocab[p2]) for p1, p2 in merges]    return vocab, readable_mergesdef main():    vocab_size = 270    vocab, merges = train_bpe("./test.txt", vocab_size, special_tokens=["<|endoftext|>"])    print(merges)if __name__ == "__main__":    import cProfile    import pstats    # with cProfile.Profile() as pr:    main()    # stats = pstats.Stats(pr)    # stats.sort_stats("cumtime").print_stats(25)
