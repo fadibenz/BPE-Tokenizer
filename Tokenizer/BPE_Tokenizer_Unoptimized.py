@@ -95,7 +95,7 @@ def train_bpe(file_path: str,
 
     token_id = (len(vocab) + len(special_tokens)) - 1
     while token_id < vocab_size - 1:
-        best_pair = next_merge(constructed_vocab)
+        best_pair = find_best_pair(constructed_vocab)
         merging(constructed_vocab, best_pair, token_id)
         token_id += 1
     return vocab, merges
