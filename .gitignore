@@ -161,3 +161,11 @@ cython_debug/
 
 .ruff_cache/
 *.zip
+
+
+# Data
+data/TinyStoriesV2-GPT4/train.txt
+data/TinyStoriesV2-GPT4/valid.txt
+
+data/OpenWebText/train.txt
+data/OpenWebText/train.txt.gz
