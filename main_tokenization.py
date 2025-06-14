@@ -20,7 +20,7 @@ if __name__ == "__main__":
     token_id_list = []
 
     with cProfile.Profile() as pr:
-        with open(path / "corpus.en", "r", encoding="utf-8") as f:
+        with open(path / "valid.txt", "r", encoding="utf-8") as f:
             for _id in tokenizer.encode_iterable(f):
                 token_id_list.append(_id)
 
