@@ -33,8 +33,8 @@ def test_train_bpe():
     )
 
     # Path to the reference tokenizer vocab and merges
-    reference_vocab_path = FIXTURES_PATH / "train-bpe-reference-vocab.json"
-    reference_merges_path = FIXTURES_PATH / "train-bpe-reference-merges.txt"
+    reference_vocab_path = FIXTURES_PATH / "train_bpe_vocab.json"
+    reference_merges_path = FIXTURES_PATH / "train_bpe_merges.txt"
 
     # Compare the learned merges to the expected output merges
     gpt2_byte_decoder = {v: k for k, v in gpt2_bytes_to_unicode().items()}

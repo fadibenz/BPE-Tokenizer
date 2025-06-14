@@ -16,7 +16,7 @@ def save_bpe(base_path: Path, vocab: dict[int, bytes], merges: list[tuple[bytes,
     with open(base_path / "train_bpe_vocab.json", "w", encoding="utf-8") as f:
         json.dump(vocab_json, f, ensure_ascii=False, indent=2)
 
-    with open(base_path / "train_bpe_merges.text", "w", encoding="utf-8") as f:
+    with open(base_path / "train_bpe_merges.txt", "w", encoding="utf-8") as f:
         for left_bytes, right_bytes in merges:
             left = ''.join([byte_encoder[b] for b in left_bytes])
             right = ''.join([byte_encoder[b] for b in right_bytes])
