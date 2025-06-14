@@ -1,13 +1,36 @@
 import json
+from collections import defaultdict
 from typing import Iterable, Iterator
-import regex as re
 from Tokenizer.BPE_Tokenizer_Optimized import pre_tokenization
+from pathlib import Path
+
+class Node:
+    def __init__(self, value):
+        self.value = value
+        self.prev = None
+        self.next = None
+
+
+def build_linked_list(list_bytes: list[bytes]):
+    len_bytes = len(list_bytes)
+    list_nodes = [Node(value) for value in list_bytes ]
+    len_list_nodes = len(list_nodes)
+
+    for index in range(len_list_nodes):
+        if index < len_bytes - 1:
+            list_nodes[index].next = list_nodes[index + 1]
+        if index > 0:
+            list_nodes[index].prev = list_nodes[index - 1]
+
+    return list_nodes
 
 class Tokenizer:
     def __init__(self, vocab:dict[int, bytes],
                  merges:list[tuple[bytes, bytes]],
                  special_tokens:list[str] | None=None):
+
         self.vocab = vocab
+        self.merge_priority = {pair: rank for rank, pair in enumerate(merges)}
         self.merges = merges
         if not special_tokens:
             self.special_tokens = []
@@ -16,8 +39,8 @@ class Tokenizer:
         self.reverse_vocab = {value: key for key, value in vocab.items()}
 
     @classmethod
-    def from_files(cls, vocab_filepath:str,
-                   merges_filepath:str,
+    def from_files(cls, vocab_filepath:str | Path,
+                   merges_filepath:str | Path,
                    special_tokens: list[str] | None = None):
 
         merges = []
@@ -52,47 +75,74 @@ class Tokenizer:
         token_ids_list = []
 
         for pre_token in pretokenized_data:
-            token_list = [special_token for special_token in self.special_tokens if special_token in pre_token]
 
-            if len(token_list) >=1:
-                    escaped_list = [re.escape(special_token) for special_token in token_list]
-                    split_PAT = r"({})".format("|".join(escaped_list))
-                    token_list = re.findall(split_PAT, pre_token)
-                    for token in token_list:
-                        encoded_token = token.encode("utf-8")
-                        try:
-                            token_id = self.reverse_vocab[encoded_token]
-                            token_ids_list.append(token_id)
-                        except KeyError:
-                            raise Exception("Special Token Not in Vocabulary")
+            if pre_token in self.special_tokens:
+                encoded_token = pre_token.encode("utf-8")
+                try:
+                    token_ids_list.append(self.reverse_vocab[encoded_token])
+                except KeyError:
+                    raise Exception("Special Token Not in Vocabulary")
             else:
-                encoded_bytes = pre_token.encode("utf-8")
-                list_of_bytes = [bytes([b]) for b in encoded_bytes]
-                for merge in self.merges:
+                encoded_token = pre_token.encode("utf-8")
+                bigram_pairs = defaultdict(set)
+                list_of_bytes = [bytes([b]) for b in encoded_token]
+                list_nodes = build_linked_list(list_of_bytes)
+                len_nodes = len(list_nodes)
 
-                    if len(list_of_bytes) <= 1:
+                for _id in range(len_nodes - 1):
+                    bigram = (list_nodes[_id].value, list_nodes[_id + 1].value)
+                    bigram_pairs[bigram].add(list_nodes[_id])
+
+
+                while True:
+                    potential_merges = {pair: rank for pair, rank in self.merge_priority.items()
+                                        if pair in bigram_pairs.keys()}
+
+                    if len(potential_merges) == 0:
                         break
 
-                    if len(merge) == 0 or len(merge) == 1 :
-                        continue
+                    next_merge = min(potential_merges, key=potential_merges.get)
+                    A, B = next_merge
+                    C = A + B
+                    nodes = bigram_pairs.pop(next_merge)
 
-                    merged = True
+                    for node in list(nodes):
 
-                    while merged:
-                        merged = False
-                        for i in range(len(list_of_bytes) - 1):
-                            if (list_of_bytes[i] == merge[0]) and\
-                                    (list_of_bytes[i+1] == merge[1]):
-                                list_of_bytes = (list_of_bytes[:i] + [merge[0] + merge[1]]
-                                                 + list_of_bytes[i+2:])
-                                merged = True
-                                break
+                        if node.next is None or node.value != A or node.next.value != B:
+                            continue
 
-                for token in list_of_bytes:
+                        node_next = node.next
+                        node_next_next = node_next.next
+
+                        # Update Bigrams
+                        if node.prev is not None:
+                            bigram_pairs[(node.prev.value, A)].discard(node.prev)
+
+                        if node.next is not None:
+                            bigram_pairs[(B, node.next.value)].discard(node)
+
+                        # Change Linked list
+                        node.value = C
+                        node.next = node_next_next
+
+                        if node_next_next is not None:
+                            node_next_next.prev = node
+
+                        if node.prev is not None:
+                            bigram_pairs[(node.prev.value, C)].add(node.prev)
+                        if node.next is not None:
+                            bigram_pairs[(C, node.next.value)].add(node)
+
+                        # Cleanup of removed node
+                        node_next.next = None
+                        node_next.prev = None
+
+                head_node = list_nodes[0]
+                while head_node is not None:
                     try:
-                        token_id = self.reverse_vocab[token]
-                        token_ids_list.append(token_id)
-                    except StopIteration:
+                        token_ids_list.append(self.reverse_vocab[head_node.value])
+                        head_node = head_node.next
+                    except Exception:
                         raise Exception("Vocabulary is not consistent with merges")
         return token_ids_list
 
