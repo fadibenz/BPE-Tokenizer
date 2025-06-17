@@ -32,7 +32,7 @@ if __name__ == "__main__":
     output_path = Path("Experiments/Results")
     # In-Domain Experiments
     print("\n=== In-Domain Experiments (TinyStories) ===")
-    text_samples = sample_stories(eval_path, args.samples)
+    text_samples = sample_stories(eval_path / "valid.txt", args.samples)
 
     compression_ratios, byte_lengths, token_counts, token_ids = compression_ratio(
         tokenizer, text_samples,output_path , "TinyStories"
