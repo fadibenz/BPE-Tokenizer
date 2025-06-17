@@ -10,12 +10,6 @@ def contains_subtuple(big, sub):
             matches.append(i)
     return matches
 
-def flatten(x):
-    if isinstance(x, int):
-        return [x]
-    print(list(x))
-    return list(x)
-
 def pre_tokenization(training_data, special_tokens):
     # This is taken form github.com/openai/tiktoken/pull/234/files (GPT2)
     PAT = r"""'(?:[sdmt]|ll|ve|re)| ?\p{L}+| ?\p{N}+| ?[^\s\p{L}\p{N}]+|\s+(?!\S)|\s+"""
@@ -69,7 +63,6 @@ def train_bpe(file_path: str,
               special_tokens: list[str],
               ):
     merges = []
-    bigram_dict = defaultdict(lambda: defaultdict(set))
     # reading file
     try:
         with open(file_path, 'r') as f:
