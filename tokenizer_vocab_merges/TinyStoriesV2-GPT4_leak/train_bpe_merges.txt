@@ -84,6 +84,7 @@ c e
 l d
 ĠT im
 Ġh is
+č Ċ
 Ġs t
 k e
 Ġ e
@@ -309,6 +310,8 @@ ri ed
 ad e
 ing s
 o b
+Ġ č
+čĊ č
 p ot
 Ġw or
 Ġf ind
@@ -612,10 +615,10 @@ or t
 r m
 b er
 Ġe nd
-Ċ Ċ
 ĠThe n
 op le
 Ġe ven
+čĊ čĊč
 Ġm ag
 Ġh ard
 Ġsh iny
@@ -1773,7 +1776,6 @@ ll a
 Ġin c
 um b
 b r
-Ċ Ġ
 Ġbug s
 il k
 Ġwonder ful
@@ -1781,6 +1783,7 @@ il k
 Ġbus y
 at o
 ir p
+čĊ Ġč
 e b
 Ġw ra
 Ġprom ise
@@ -4592,6 +4595,7 @@ re at
 Ġsaf ari
 Ġrh ythm
 Ġmass age
+Ġ čĊ
 Ġstom ach
 Ġb aking
 qu ake
@@ -4683,7 +4687,6 @@ la imed
 ĠG eorge
 Ġl uck
 Ġfollow ing
-Ġ Ċ
 Ġpri ce
 ec ting
 Ġm ama
@@ -6068,7 +6071,6 @@ ist le
 ĠTh omas
 Ġpast ries
 n ie
-Ġ Ġ
 ĠO ur
 Ġexact ly
 Ġdoctor s
@@ -6207,6 +6209,7 @@ or a
 Ġitch y
 Ġknowled ge
 Ġjacket s
+Ġ Ġč
 ĠS kelly
 ĠF or
 Ġsurf ace
@@ -6509,7 +6512,6 @@ o ke
 Ġg ri
 ver s
 Ġgrow s
-Ġ ĊĠ
 Ġsweet s
 ĠGood bye
 Ġown ers
@@ -6564,6 +6566,7 @@ ind r
 ĠCo pper
 ĠB all
 Ġactiv ities
+Ġ čĊĠč
 le ts
 Ġpec ked
 ĠH annah
@@ -7803,6 +7806,7 @@ H annah
 f ound
 Ġtrust ing
 Ġca using
+čĊ čĊ
 M at
 M ad
 Ġleap t
@@ -9567,6 +9571,7 @@ w orking
 ĠRo ar
 ĠC oby
 ĠB a
+ĠčĊ čĊ
 u dge
 ever se
 !' .
@@ -9736,8 +9741,3 @@ Fr oggy
 Ġimpro ving
 Ġbo oth
 ĠL and
-S urrender
-Rock y
-Ġmeadow s
-Ġimag inary
-Ġbo ld
