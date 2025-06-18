@@ -35,9 +35,9 @@ if __name__ == "__main__":
     text_samples = sample_stories(eval_path / "valid.txt", args.samples)
 
     compression_ratios, byte_lengths, token_counts, token_ids = compression_ratio(
-        tokenizer, text_samples,output_path , "TinyStories"
+        tokenizer, text_samples,output_path , "OpenWebText"
     )
-    token_length_histogram(tokenizer, token_ids, output_path, "TinyStories")
-    word_fragmentation_stats(tokenizer, text_samples, output_path, "TinyStories")
+    token_length_histogram(tokenizer, token_ids, output_path, "OpenWebText")
+    word_fragmentation_stats(tokenizer, text_samples, output_path, "OpenWebText")
     if args.test_tokenizer:
-        top_k_longest_tokens(tokenizer, token_ids, output_path, corpus_name="TinyStories")
+        top_k_longest_tokens(tokenizer, token_ids, output_path, corpus_name="OpenWebText")

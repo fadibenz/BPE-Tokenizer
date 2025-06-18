@@ -5,6 +5,7 @@ import random
 from typing import List
 from pathlib import Path
 
+
 def sample_stories(
         path: Path,
         number: int = 1000,
@@ -48,6 +49,7 @@ def sample_stories(
                 reservoir[random.randint(0, number - 1)] = current_story.strip()
 
     return reservoir
+
 
 def log_stats(stats, output_path):
 
