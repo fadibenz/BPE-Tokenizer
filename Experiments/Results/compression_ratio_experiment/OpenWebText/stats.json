@@ -1,0 +1,9 @@
+{
+  "compression_ratio": {
+    "bpe_mean": 4.123006856320409,
+    "bpe_std": 0.212505346533576,
+    "bpe_min": 3.515625,
+    "bpe_max": 4.917525773195877,
+    "byte_level_mean": 1.0
+  }
+}

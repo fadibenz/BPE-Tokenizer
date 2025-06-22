@@ -5,8 +5,6 @@ import matplotlib.pyplot as plt
 from Experiments.utils import sample_stories, log_stats
 from Experiments.compression_ratio import compression_ratio
 from Experiments.word_fragmentation_rate import word_fragmentation_stats
-from tests.test_tokenizer import get_tokenizer_from_vocab_merges_path
-
 
 def data_leakage_experiment(
         tokenizer_a,
@@ -74,14 +72,10 @@ def data_leakage_experiment(
         "validation_metrics": {
             "tokenizer_a_bytes_per_token": valid_a_stats[0].mean(),
             "tokenizer_b_bytes_per_token": valid_b_stats[0].mean(),
-            "tokenizer_a_fragmentation": valid_a_stats[1]["word_fragmentation"]["three_or_more_tokens"],
-            "tokenizer_b_fragmentation": valid_b_stats[1]["word_fragmentation"]["three_or_more_tokens"]
         },
         "test_metrics": {
             "tokenizer_a_bytes_per_token": test_a_stats[0].mean(),
             "tokenizer_b_bytes_per_token": test_b_stats[0].mean(),
-            "tokenizer_a_fragmentation": test_a_stats[1]["word_fragmentation"]["three_or_more_tokens"],
-            "tokenizer_b_fragmentation": test_b_stats[1]["word_fragmentation"]["three_or_more_tokens"]
         }
     })
     log_stats(stats, output_path)

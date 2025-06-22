@@ -1,0 +1,14 @@
+{
+  "token_overlap": {
+    "tokenizer_a": 0.5895788722341185,
+    "tokenizer_b": 0.5899267726379711
+  },
+  "validation_metrics": {
+    "tokenizer_a_bytes_per_token": 4.178294573643411,
+    "tokenizer_b_bytes_per_token": 4.178294573643411
+  },
+  "test_metrics": {
+    "tokenizer_a_bytes_per_token": 4.201492537313433,
+    "tokenizer_b_bytes_per_token": 4.201492537313433
+  }
+}

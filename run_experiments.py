@@ -32,12 +32,12 @@ if __name__ == "__main__":
     output_path = Path("Experiments/Results")
     # In-Domain Experiments
     print("\n=== In-Domain Experiments (TinyStories) ===")
-    text_samples = sample_stories(eval_path / "valid.txt", args.samples)
+    text_samples = sample_stories(eval_path / "valida.txt", args.samples)
 
     compression_ratios, byte_lengths, token_counts, token_ids = compression_ratio(
         tokenizer, text_samples,output_path , "OpenWebText"
     )
-    token_length_histogram(tokenizer, token_ids, output_path, "OpenWebText")
-    word_fragmentation_stats(tokenizer, text_samples, output_path, "OpenWebText")
+    # token_length_histogram(tokenizer, token_ids, output_path, "OpenWebText")
+    # word_fragmentation_stats(tokenizer, text_samples, output_path, "OpenWebText")
     if args.test_tokenizer:
         top_k_longest_tokens(tokenizer, token_ids, output_path, corpus_name="OpenWebText")

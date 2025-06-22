@@ -2,51 +2,79 @@ from pathlib import Path
 import random
 
 
-def split_train_valid(input_path: Path, output_dir: Path, valid_size: int = 200000, seed: int = 2024):
+def story_generator(input_path: Path, delimiter: str = "<|endoftext|>"):
+    with open(input_path, "r", encoding="utf-8", errors="ignore") as f:
+        buffer = ""
+        while chunk := f.read(512 * 512):
+            buffer += chunk
+            parts = buffer.split(delimiter)
+            buffer = parts[-1]  # incomplete part, carry forward
+            for part in parts[:-1]:
+                if part.strip():
+                    yield part.strip()
+        if buffer.strip():
+            yield buffer.strip()
+
+
+def split_train_valid(input_path: Path, output_dir: Path, train_size: int, valid_size: int, seed: int = 2024):
     random.seed(seed)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    # Read stories in chunks and count total
-    stories = []
-    delimiter = "<|endoftext|>"
-    current_story = ""
-    total_stories = 0
+    print("Counting total stories... (this may take a while)")
+    total_stories = sum(1 for _ in story_generator(input_path))
+    print(f"Total stories found: {total_stories}")
 
-    with open(input_path, "r", encoding="utf-8", errors="ignore") as f:
-        while chunk := f.read(256 * 256):  # 1MB chunks
-            current_story += chunk
-            parts = current_story.split(delimiter)
-            current_story = parts[-1]
-            for part in parts[:-1]:
-                if part.strip():
-                    stories.append(part.strip())
-                    total_stories += 1
-            if total_stories % 100000 == 0:
-                print(f"Processed {total_stories} stories")
+    if train_size + valid_size > total_stories:
+        raise ValueError(
+            f"Requested train_size ({train_size}) + valid_size ({valid_size}) is greater than total stories ({total_stories})")
 
-    if current_story.strip():
-        stories.append(current_story.strip())
-        total_stories += 1
+    all_indices = list(range(total_stories))
+    random.shuffle(all_indices)
 
-    print(f"Total stories: {total_stories}")
+    valid_indices = set(all_indices[:valid_size])
+    train_indices = set(all_indices[valid_size: valid_size + train_size])
 
-    # Sample validation indices
-    valid_indices = random.sample(range(total_stories), min(valid_size, total_stories))
-    valid_indices_set = set(valid_indices)
+    train_written = 0
+    valid_written = 0
 
-    # Write train and valid files
+    print("Splitting and writing...")
     with open(output_dir / "train.txt", "w", encoding="utf-8") as train_f, \
             open(output_dir / "valid.txt", "w", encoding="utf-8") as valid_f:
-        for i, story in enumerate(stories):
-            if i in valid_indices_set:
-                valid_f.write(story + delimiter)
-            else:
-                train_f.write(story + delimiter)
+        for i, story in enumerate(story_generator(input_path)):
+            if i in valid_indices:
+                valid_f.write(story + "<|endoftext|>")
+                valid_written += 1
+            elif i in train_indices:
+                train_f.write(story + "<|endoftext|>")
+                train_written += 1
 
-    print(f"Saved {len(valid_indices)} stories to valid.txt, {total_stories - len(valid_indices)} to train.txt")
+            if (i + 1) % 100000 == 0:
+                print(f"Processed {i + 1}/{total_stories} stories...")
 
+            if train_written == train_size and valid_written == valid_size:
+                print("Collected all required stories. Stopping early.")
+                break
+
+    print(f"Saved {valid_written} stories to valid.txt and {train_written} to train.txt")
+
+
+def append_file_to_file(source_file_path, destination_file_path):
+
+    CHUNK_SIZE = 1024 *  1024 * 8
+    with open(source_file_path, "r", encoding="utf-8") as src_f:
+        with open(destination_file_path, "a", encoding="utf-8") as dst_f:
+            while chunk := src_f.read(CHUNK_SIZE):
+                dst_f.write(chunk)
 
 if __name__ == "__main__":
+    # source_path = Path("data/TinyStoriesV2-GPT4/amplified_split/valid.txt")
+    # dest_path = Path("data/TinyStoriesV2-GPT4/amplified_split/train+valid.txt")
+    # append_file_to_file(source_path, dest_path)
+
     input_path = Path("data/TinyStoriesV2-GPT4/train.txt")
-    output_dir = Path("data/TinyStoriesV2-GPT4/split")
-    split_train_valid(input_path, output_dir, valid_size=300000)
+    output_dir = Path("data/TinyStoriesV2-GPT4/amplified_split")
+
+    train_stories = 550000
+    valid_stories = 220000
+
+    split_train_valid(input_path, output_dir, train_size=train_stories, valid_size=valid_stories)

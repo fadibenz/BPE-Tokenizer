@@ -52,6 +52,5 @@ def sample_stories(
 
 
 def log_stats(stats, output_path):
-
     with open(output_path / "stats.json", "w") as f:
         json.dump(stats, f, indent=2)

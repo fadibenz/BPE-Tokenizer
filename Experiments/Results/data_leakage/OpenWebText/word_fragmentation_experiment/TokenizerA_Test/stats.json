@@ -1,0 +1,8 @@
+{
+  "word_fragmentation": {
+    "mean_tokens_per_word": 1.7399470833437336,
+    "one_token": 0.4659411427002471,
+    "two_token": 0.359583655742206,
+    "three_or_more_tokens": 0.17447520155754687
+  }
+}

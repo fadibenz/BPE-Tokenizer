@@ -165,3 +165,12 @@ cython_debug/
 
 # Data
 data
+tokenizer_vocab_merges/TinyStoriesV2-GPT4_amplified/leak/tokenized_test.npy
+tokenizer_vocab_merges/TinyStoriesV2-GPT4_amplified/leak/tokenized_train.npy
+tokenizer_vocab_merges/TinyStoriesV2-GPT4_amplified/leak/tokenized_valid.npy
+
+
+tokenizer_vocab_merges/TinyStoriesV2-GPT4_amplified/no_leak/tokenized_test.npy
+tokenizer_vocab_merges/TinyStoriesV2-GPT4_amplified/no_leak/tokenized_train.npy
+tokenizer_vocab_merges/TinyStoriesV2-GPT4_amplified/no_leak/tokenized_valid.npy
+
