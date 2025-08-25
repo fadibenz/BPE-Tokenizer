@@ -1,5 +1,7 @@
 # BPE Tokenizer Implementation
 
+Blog post with all engineering details: https://fadibenz.vercel.app/blog/BPE-Tokenization
+
 This project implements a **byte-level Byte-Pair Encoding (BPE) tokenizer** from scratch, 
 including vocabulary construction, merge operations, and a tokenizer interface for encoding and decoding. 
 The implementation was developed as part of a course assignment on tokenization and tokenizer training for language models.
